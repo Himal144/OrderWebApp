@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using OrderWebApp.Models;
 using System.Diagnostics;
 
-namespace OrderWebApp.Controllers
+namespace OrderWebApp.Areas.Customer.Controllers
 {
+    [Area("Customer")]  
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

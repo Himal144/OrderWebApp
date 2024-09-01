@@ -1,5 +1,13 @@
-using OrderWebApp.Data;
+using OrderWebApp.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
+using OrderWebApp.DataAccess.Repository.IRepository;
+using OrderWebApp.DataAccess.Repository;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using System;
+using Microsoft.Extensions.Hosting;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +18,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"),
         new MySqlServerVersion(new Version(8, 0, 26)) // replace with your MySQL version
     ));
+
+//Adding the service of the ICategoryRepository and its implementation also.
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 var app = builder.Build();
 
@@ -29,7 +40,14 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+   pattern: "{controller=home}/{action=index}/{id?}",
+    defaults: new { area = "Customer" });
+   
+
 
 app.Run();

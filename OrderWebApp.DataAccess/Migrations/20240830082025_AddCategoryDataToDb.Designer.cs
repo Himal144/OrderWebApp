@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using OrderWebApp.Data;
+using OrderWebApp.DataAccess.Data;
 
 #nullable disable
 
-namespace OrderWebApp.Migrations
+namespace OrderWebApp.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20240830082025_AddCategoryDataToDb")]

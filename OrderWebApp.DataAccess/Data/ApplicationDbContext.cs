@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OrderWebApp.Models;
 
-namespace OrderWebApp.Data
+namespace OrderWebApp.DataAccess.Data
 {
     public class ApplicationDbContext : DbContext
     {

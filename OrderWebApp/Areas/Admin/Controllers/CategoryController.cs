@@ -1,21 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using OrderWebApp.Data;
+﻿using OrderWebApp.DataAccess.Repository.IRepository;
+using Microsoft.AspNetCore.Mvc;
+using OrderWebApp.DataAccess.Data;
 using OrderWebApp.Models;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace OrderWebApp.Controllers
+
+namespace OrderWebApp.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CategoryController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public CategoryController(ApplicationDbContext db)
+        private readonly IUnitOfWork _unitofwork;
+        public CategoryController(IUnitOfWork unitOfWork)
         {
-            _db = db;
-            
+            _unitofwork = unitOfWork;
         }
+
         public IActionResult Index()
         {
-            
-            List<Category> objCategoriesList = _db.Categories.ToList();
+
+            List<Category> objCategoriesList = _unitofwork.Category.GetAll().ToList();
             return View(objCategoriesList);
         }
 
@@ -29,22 +34,22 @@ namespace OrderWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-            _db.Categories.Add(obj);
-            _db.SaveChanges();
-            TempData["Success"] = "Category created successfully.";
-            return RedirectToAction("Index");
+                _unitofwork.Category.Add(obj);
+                _unitofwork.Save();
+                TempData["Success"] = "Category created successfully.";
+                return RedirectToAction("Index");
             }
             return View();
         }
 
 
-        public IActionResult Edit( int? id)
+        public IActionResult Edit(int? id)
         {
-            if(id==null || id == 0)
+            if (id == null || id == 0)
             {
                 return NotFound();
             }
-            Category? dbCategoryObj = _db.Categories.Find(id);
+            Category? dbCategoryObj = _unitofwork.Category.Get(u => u.Id == id);
 
             //Different method for finding the Category objects
             //Category? dbCategoryObj1 = _db.Categories.FirstOrDefault(u=>u.Id==id);
@@ -63,8 +68,8 @@ namespace OrderWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Categories.Update(obj);
-                _db.SaveChanges();
+                _unitofwork.Category.Update(obj);
+                _unitofwork.Save();
                 TempData["Info"] = "Category Updated successfully.";
                 return RedirectToAction("Index");
             }
@@ -80,7 +85,7 @@ namespace OrderWebApp.Controllers
             {
                 return NotFound();
             }
-            Category? dbCategoryObj = _db.Categories.Find(id);
+            Category? dbCategoryObj = _unitofwork.Category.Get(u => u.Id == id);
 
             if (dbCategoryObj == null)
             {
@@ -89,20 +94,20 @@ namespace OrderWebApp.Controllers
             return View(dbCategoryObj);
         }
 
-        [HttpPost,ActionName("Delete")]
+        [HttpPost, ActionName("Delete")]
         public IActionResult DeletePost(int? id)
         {
-            
-                 Category? dbCategoryObj= _db.Categories.Find(id);
-                 if (dbCategoryObj == null)
-                {
-                    return NotFound();
-                }
-            _db.Categories.Remove(dbCategoryObj);
-            _db.SaveChanges();
+
+            Category? dbCategoryObj = _unitofwork.Category.Get(u => u.Id == id);
+            if (dbCategoryObj == null)
+            {
+                return NotFound();
+            }
+            _unitofwork.Category.Remove(dbCategoryObj);
+            _unitofwork.Save();
             TempData["Danger"] = "Category Deleted successfully.";
             return RedirectToAction("Index");
-                 
+
         }
     }
 }
