@@ -1,0 +1,75 @@
+﻿@model Company
+
+
+<div class="border p-3 mt-4">
+    <div class="row ">
+        <h2 class="text-primary text-center">@(Model.Id==0?"Create":"Update") Company</h2>
+        <hr />
+    </div>
+   <div class="row">
+       <div class="col-md-10">
+           <form method="post" enctype="multipart/form-data">
+               <input asp-for="Id" hidden/>
+    <div class="mb-3 row p-2">
+        <label asp-for="Name" class="p-0"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+                <div class="mb-3 row p-2">
+                    <label asp-for="PhoneNumber" class="p-0"></label>
+                    <input asp-for="PhoneNumber" class="form-control" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+      <div class="mb-3 row p-2">
+        <label asp-for="StreetAddress" class="p-0"></label>
+                    <input asp-for="StreetAddress" class="form-control"/>
+                    <span asp-validation-for="StreetAddress" class="text-danger"></span>
+    </div>
+    <div class="mb-3 row p-2">
+        <label asp-for="City" class="p-0"></label>
+                    <input asp-for="City" class="form-control" />
+                    <span asp-validation-for="City" class="text-danger"></span>
+    </div>
+    <div class="mb-3 row p-2">
+        <label asp-for="State" class="p-0"></label>
+                    <input asp-for="State" class="form-control" />
+                    <span asp-validation-for="State" class="text-danger"></span>
+    </div>
+    
+
+    <div class="row">
+        <div class=" col-6 col-md-3 my-1 ">
+            @if(Model.Id==0){
+    <button type="submit" class="btn btn-primary form-control"  > Create</button>
+            }
+            else{
+                      <button type="submit" class="btn btn-primary form-control"  > Update</button>
+            }
+        </div>
+        <div class=" col-6 col-md-3  my-1  text-end">
+            <a asp-controller="Company" asp-action="Index" class="btn btn-secondary border form-control" > Back to List</a>
+        </div>
+    </div>
+</form>
+</div>
+
+       <div class="col-md-2" width="100%">
+         
+       </div>
+   </div>
+ </div>
+
+
+
+
+@* Adding partialvalidationscripts for the client side validation which is automatically provided by the jquery *@
+
+        @section Scripts{
+            @{
+                        <partial name="_ValidationScriptsPartial"/>
+
+            }
+         @*    Scripts for the Tiny text editor *@
+           
+    
+        }

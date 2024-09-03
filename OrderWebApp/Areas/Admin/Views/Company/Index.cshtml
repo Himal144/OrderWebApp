@@ -1,0 +1,29 @@
+﻿
+
+<partial name="_Notification"></partial>
+<div class="container ">
+    <div class="row pt-4 pb-2">
+        <div class="col-6">
+            <h2>Company List</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Company" asp-action="Upsert" class="btn btn-primary">  <i class="bi bi-plus-circle"></i>          Add new Company</a>
+        </div>
+    </div>
+</div>
+<table id="tblData" class="table table-bordered table-striped">
+    <thead>
+    <tr>
+        <th class="text-center">Company Name</th>
+            <th class="text-center">Street Address</th>
+            <th class="text-center">City</th>
+            <th class="text-center">State</th>
+            <th class="text-center">Phone Number</th>
+    </tr>
+    </thead>
+ 
+</table>
+
+                        @section scripts{
+                            <script src="~/js/company/company.js"></script>
+                        }

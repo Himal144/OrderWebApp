@@ -5,11 +5,11 @@ VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderWebApp", "OrderWebApp\OrderWebApp.csproj", "{CED2B4C0-FD31-47E6-A5DB-4A71F5C49B54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderWebApp.DataAccess", "OrderWebApp.DataAccess\OrderWebApp.DataAccess.csproj", "{7EB3E0E4-98FD-4603-B91F-AB5862F9CC3E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderWebApp.DataAccess", "OrderWebApp.DataAccess\OrderWebApp.DataAccess.csproj", "{7EB3E0E4-98FD-4603-B91F-AB5862F9CC3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderWebApp.Models", "OrderWebApp.Models\OrderWebApp.Models.csproj", "{F9E39D4F-3AD1-461F-B336-6A2D45597C02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderWebApp.Models", "OrderWebApp.Models\OrderWebApp.Models.csproj", "{F9E39D4F-3AD1-461F-B336-6A2D45597C02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderWebApp.Utility", "OrderWebApp.Utility\OrderWebApp.Utility.csproj", "{E85AFC03-E848-4DF1-ACF6-52EF37833B27}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderWebApp.Utility", "OrderWebApp.Utility\OrderWebApp.Utility.csproj", "{E85AFC03-E848-4DF1-ACF6-52EF37833B27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
