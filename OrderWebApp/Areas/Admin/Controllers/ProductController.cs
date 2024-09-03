@@ -6,10 +6,13 @@ using OrderWebApp.Models.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
+using OrderWebApp.Utility;
 
 namespace OrderWebApp.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = (SD.Role_Admin))]
     public class ProductController : Controller
     {
 
@@ -191,12 +194,13 @@ namespace OrderWebApp.Areas.Admin.Controllers
         #region API CALLS
         [HttpGet]
         public IActionResult GetALL() {
-            List<Product> objCategoriesList = _unitofwork.Product.GetAll().ToList();
+            List<Product> objCategoriesList = _unitofwork.Product.GetAll(includeProperties:"Category").ToList();
             return Json(new {data= objCategoriesList});
         }
 
 
         [HttpDelete]
+       
         public IActionResult Delete( int? id)
         {
             var productToBeDeleted = _unitofwork.Product.Get(u => u.Id == id);

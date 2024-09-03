@@ -4,11 +4,14 @@ using OrderWebApp.DataAccess.Data;
 using OrderWebApp.Models;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using OrderWebApp.Utility;
 
 
 namespace OrderWebApp.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles =(SD.Role_Admin))]
     public class CategoryController : Controller
     {
         private readonly IUnitOfWork _unitofwork;
