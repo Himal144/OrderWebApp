@@ -41,6 +41,11 @@ namespace OrderWebApp.Areas.Customer.Controllers
         [Authorize]
         public IActionResult Details(ShoppingCart shoppingCart)
         {
+            if(shoppingCart.Count <= 0)
+            {
+                TempData["Error"] = "Product quantity must be greater then one.";
+                return RedirectToAction(nameof(Details));
+            }
             shoppingCart.Id = 0;
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;

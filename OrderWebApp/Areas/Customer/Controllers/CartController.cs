@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OrderWebApp.DataAccess.Repository.IRepository;
 using OrderWebApp.Models;
 using OrderWebApp.Models.ViewModels;
+using OrderWebApp.Utility;
 using System.Security.Claims;
 
 namespace OrderWebApp.Areas.Customer.Controllers
@@ -12,6 +13,7 @@ namespace OrderWebApp.Areas.Customer.Controllers
     public class CartController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        [BindProperty]
         public ShoppingCartVM ShoppingCartVM { get; set; }
         public CartController(IUnitOfWork unitOfWork)
         {
@@ -24,13 +26,13 @@ namespace OrderWebApp.Areas.Customer.Controllers
             var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             ShoppingCartVM= new() { 
-                ShoppingCartList=_unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId,includeProperties:("Product"))
-            
+                ShoppingCartList=_unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId,includeProperties:("Product")),
+                OrderHeader = new()
             };
             foreach(var cart in ShoppingCartVM.ShoppingCartList)
             {
                  cart.Price = GetPriceBasedOnQuantity(cart);
-                ShoppingCartVM.OrderTotal += (cart.Price*cart.Count);
+                ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price*cart.Count);
             }
 
             return View(ShoppingCartVM);
@@ -39,8 +41,104 @@ namespace OrderWebApp.Areas.Customer.Controllers
 
         public IActionResult Summary()
         {
-            return View();
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ShoppingCartVM = new()
+            {
+                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId, includeProperties: ("Product")),
+                OrderHeader = new()
+            };
+            ShoppingCartVM.OrderHeader.ApplicationUser = _unitOfWork.ApplicationUser.Get(u=>u.Id == userId);
+
+            ShoppingCartVM.OrderHeader.Name = ShoppingCartVM.OrderHeader.ApplicationUser.Name;
+            ShoppingCartVM.OrderHeader.Address = ShoppingCartVM.OrderHeader.ApplicationUser.Address;
+            ShoppingCartVM.OrderHeader.PhoneNumber = ShoppingCartVM.OrderHeader.ApplicationUser.PhoneNumber;
+            foreach (var cart in ShoppingCartVM.ShoppingCartList)
+            {
+                cart.Price = GetPriceBasedOnQuantity(cart);
+                ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
+            }
+
+
+            return View(ShoppingCartVM);
         }
+
+        [HttpPost]
+        [ActionName("Summary")]
+        public IActionResult SummaryPOST()
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ShoppingCartVM.ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId, includeProperties: ("Product"));
+        
+           ApplicationUser applicationUser = _unitOfWork.ApplicationUser.Get(u => u.Id == userId);
+           
+
+            ShoppingCartVM.OrderHeader.ApplicationUserId = userId;
+            ShoppingCartVM.OrderHeader.OrderDate= System.DateTime.Now;
+
+            foreach (var cart in ShoppingCartVM.ShoppingCartList)
+            {
+                cart.Price = GetPriceBasedOnQuantity(cart);
+                ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
+            }
+
+            if(applicationUser.CompanyId.GetValueOrDefault() == 0)
+            {
+                //It is a regular customer we need to capture the payment 
+                ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
+                ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
+
+            }
+            else
+            {
+                //It is a company user so we can delayed payment for 30 days
+                ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusDelayedPayment;
+                ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusApproved;
+            }
+            _unitOfWork.OrderHeader.Add(ShoppingCartVM.OrderHeader);
+            _unitOfWork.Save();
+
+            foreach (var cart in ShoppingCartVM.ShoppingCartList)
+            {
+                OrderDetail orderDetail = new()
+                {
+                    OrderHeaderId = ShoppingCartVM.OrderHeader.Id,
+                    ProductId = cart.ProductId,
+                    Price = cart.Price
+
+                };
+                _unitOfWork.OrderDetail.Add(orderDetail);
+            }
+            _unitOfWork.Save();
+            if (applicationUser.CompanyId.GetValueOrDefault() == 0)
+            {
+                //It is a regular customer we need to capture the payment 
+                //Payment logic
+                TempData["Info"] = "We currently only accept the company order.";
+                return View(ShoppingCartVM);
+               
+
+            }
+            else
+            {
+                return RedirectToAction(nameof(OrderConfirmation), new { id = ShoppingCartVM.OrderHeader.Id });
+            }
+        }
+
+
+
+        public IActionResult OrderConfirmation(int id)
+        {
+            OrderHeader orderHeader = _unitOfWork.OrderHeader.Get(u=>u.Id == id,includeProperties:("ApplicationUser"));
+            List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
+            _unitOfWork.ShoppingCart.RemoveRange(shoppingCarts);
+            _unitOfWork.Save();
+            return View(id);
+        }
+
 
         public IActionResult Plus(int cartId)
         {

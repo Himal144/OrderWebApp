@@ -16,6 +16,7 @@ namespace OrderWebApp.Models
         public string Name { get; set; }
         public string? Address { get; set; }
 
+
         public int? CompanyId { get; set; }
         [ForeignKey("CompanyId")]
         [ValidateNever]
