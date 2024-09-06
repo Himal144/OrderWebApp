@@ -68,6 +68,13 @@ namespace OrderWebApp.Areas.Customer.Controllers
         [ActionName("Summary")]
         public IActionResult SummaryPOST()
         {
+            if (string.IsNullOrEmpty(ShoppingCartVM.OrderHeader.Name) || 
+                string.IsNullOrEmpty(ShoppingCartVM.OrderHeader.Address) ||
+                string.IsNullOrEmpty(ShoppingCartVM.OrderHeader.PhoneNumber))
+            {
+                TempData["Info"] = "Please fill the Pickup details first.";
+                return RedirectToAction(nameof(Summary));
+            }
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
@@ -78,6 +85,7 @@ namespace OrderWebApp.Areas.Customer.Controllers
 
             ShoppingCartVM.OrderHeader.ApplicationUserId = userId;
             ShoppingCartVM.OrderHeader.OrderDate= System.DateTime.Now;
+            ShoppingCartVM.OrderHeader.PaymentDueDate = System.DateOnly.FromDateTime(DateTime.Now).AddDays(30);
 
             foreach (var cart in ShoppingCartVM.ShoppingCartList)
             {
@@ -107,7 +115,8 @@ namespace OrderWebApp.Areas.Customer.Controllers
                 {
                     OrderHeaderId = ShoppingCartVM.OrderHeader.Id,
                     ProductId = cart.ProductId,
-                    Price = cart.Price
+                    Price = cart.Price,
+                    count = cart.Count
 
                 };
                 _unitOfWork.OrderDetail.Add(orderDetail);

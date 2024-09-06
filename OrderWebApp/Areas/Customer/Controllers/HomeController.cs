@@ -50,6 +50,7 @@ namespace OrderWebApp.Areas.Customer.Controllers
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
             shoppingCart.ApplicationUserId=userId;
+            
 
             //Logic to check whether the user have already the cart with same product
             ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.Get(u=>u.ApplicationUserId == userId && u.ProductId== shoppingCart.ProductId);
